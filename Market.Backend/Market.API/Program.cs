@@ -49,7 +49,7 @@ public partial class Program {
             .Validate(o => !string.IsNullOrWhiteSpace(o.Audience), "Jwt:Audience is missing.")
             .ValidateOnStart();
 
-        // nakon .AddOptions<JwtOptions>()...
+        // after .AddOptions<JwtOptions>()...
         builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

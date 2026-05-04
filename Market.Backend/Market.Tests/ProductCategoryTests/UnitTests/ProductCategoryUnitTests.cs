@@ -9,7 +9,7 @@ public class ProductCategoryUnitTests
     private DatabaseContext GetInMemoryDbContext()
     {
         var options = new DbContextOptionsBuilder<DatabaseContext>()
-            .UseInMemoryDatabase(Guid.NewGuid().ToString()) // svaki test dobije novu bazu
+            .UseInMemoryDatabase(Guid.NewGuid().ToString()) // Each test gets a new database.
             .Options;
 
         return new DatabaseContext(options);

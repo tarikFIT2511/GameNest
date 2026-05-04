@@ -39,7 +39,7 @@
     private static ErrorDto BuildErrorDto(Exception ex, bool isDev, string traceId)
     {
         string code = "internal.error";
-        string message = "Došlo je do greške. Pokušajte ponovo.";
+        string message = "An error occurred. Please try again.";
 
         List<FieldErrorDto>? fieldErrors = null;
 
@@ -54,7 +54,7 @@
 
             case ValidationException vex:
                 code = "validation.error";
-                message = "Validacija nije prošla.";
+                message = "Validation failed.";
                 fieldErrors = vex.Errors
                     .Select(e => new FieldErrorDto
                     {
@@ -72,7 +72,7 @@
             Message = message,
             TraceId = traceId,
             Errors = fieldErrors,
-            // DEV okruženje može dobiti detalje:
+            // DEV environment may receive detailed error information:
             Details = isDev ? ex.ToString() : null
         };
     }
@@ -83,8 +83,8 @@ public sealed class ErrorDto
     public string Code { get; set; } = default!;
     public string Message { get; set; } = default!;
     public string? TraceId { get; set; }
-    public string? Details { get; set; }           // samo u Dev
-    public List<FieldErrorDto>? Errors { get; set; } // per-field validacije
+    public string? Details { get; set; }           // only in Dev
+    public List<FieldErrorDto>? Errors { get; set; } // per-field of validation
 }
 
 public sealed class FieldErrorDto

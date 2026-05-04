@@ -21,7 +21,7 @@ public sealed class JwtTokenService(IOptions<JwtOptions> options) : IJwtTokenSer
             new(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Email, user.Email),
             new(ClaimTypes.Name, user.Email),
             new(ClaimTypes.Role, user.Role),
-            new("ver", user.TokenVersion.ToString()) // za global revoke
+            new("ver", user.TokenVersion.ToString()) // for global revoke
         };
 
         var creds = new SigningCredentials(
@@ -56,7 +56,7 @@ public sealed class JwtTokenService(IOptions<JwtOptions> options) : IJwtTokenSer
 
     public string HashRefreshToken(string rawToken)
     {
-        // stabilan hash (npr. SHA256) — za demo ok; u produkciji razmotri HMAC s server-secretom
+        // Stable hash (e.g. SHA256) — OK for demo; in production consider HMAC with a server secret.
         using var sha = SHA256.Create();
         var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(rawToken));
         return Convert.ToHexString(bytes);

@@ -30,12 +30,12 @@ public partial class DatabaseContext
 
         ApplyGlobalFielters(modelBuilder);
 
-        StaticDataSeeder.Seed(modelBuilder); // statički podaci
+        StaticDataSeeder.Seed(modelBuilder); // static records
     }
 
     private void ApplyGlobalFielters(ModelBuilder modelBuilder)
     {
-        // Primijeni globalni filter na sve entitete koji nasljeđuju BaseEntity
+        // Apply a global query filter to all entities that inherit from BaseEntity
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
             if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))

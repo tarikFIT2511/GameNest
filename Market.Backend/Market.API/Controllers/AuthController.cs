@@ -18,18 +18,18 @@ public sealed class AuthController(
             .FirstOrDefaultAsync(x => x.Email == req.Email && x.IsEnabled && !x.IsDeleted, ct);
 
         if (user is null)
-            throw new MarketNotFoundException("Korisnik nije pronađen ili je onemogućen.");
+            throw new MarketNotFoundException("User not found or is disabled.");
 
         var hasher = new PasswordHasher<UserEntity>();
         var vr = hasher.VerifyHashedPassword(user, user.PasswordHash, req.Password);
         if (vr == PasswordVerificationResult.Failed)
-            throw new MarketConflictException("Pogrešni kredencijali.");
+            throw new MarketConflictException("Invalid credentials.");
 
-        // izdavanje token para
+        // issuing token pair
         var pair = tokens.Issue(user);
 
-        // sačuvaj refresh hash
-        var (_, hash, exp) = tokens.IssueRefreshToken(); // već pozvano unutar Issue; izdamo NOVI jer želimo par iz baze == response
+        // save refresh hash
+        var (_, hash, exp) = tokens.IssueRefreshToken(); // already called inside Issue; we issue a NEW one because we want the pair from the database == response
         var rt = new RefreshTokenEntity
         {
             TokenHash = tokens.HashRefreshToken(pair.RefreshToken),
@@ -53,13 +53,13 @@ public sealed class AuthController(
             .FirstOrDefaultAsync(x => x.TokenHash == hash && !x.IsRevoked && !x.IsDeleted, ct);
 
         if (rt is null || rt.ExpiresAtUtc < DateTime.UtcNow)
-            throw new MarketConflictException("Refresh token je nevažeći.");
+            throw new MarketConflictException("Refresh token is invalid.");
 
         // (optional) provjeri fingerprint:
         if (rt.Fingerprint != null && req.Fingerprint != null && rt.Fingerprint != req.Fingerprint)
-            throw new MarketConflictException("Neispravan klijentski otisak.");
+            throw new MarketConflictException("Invalid client fingerprint.");
 
-        // rotacija refresh tokena (revoke stari, upiši novi)
+        // rotation of refresh tokens (revoke old, enter a new one)
         rt.IsRevoked = true;
 
         var user = rt.User;

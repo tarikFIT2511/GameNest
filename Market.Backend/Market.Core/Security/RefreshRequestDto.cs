@@ -1,17 +1,18 @@
 ﻿namespace Market.Core.Security;
 
 /// <summary>
-/// Zahtjev za osvježavanje JWT tokena pomoću refresh tokena.
+/// Request for refreshing a JWT token using a refresh token.
 /// </summary>
 public sealed class RefreshRequestDto
 {
     /// <summary>
-    /// Refresh token koji je prethodno izdat korisniku.
+    /// Refresh token previously issued to the user.
     /// </summary>
     public required string RefreshToken { get; set; }
 
     /// <summary>
-    /// Klijentski otisak (optional) — koristi se za dodatnu provjeru da osvježavanje dolazi s istog uređaja.
+    /// Client fingerprint (optional) — used to additionally verify that the refresh request
+    /// is coming from the same device.
     /// </summary>
     public string? Fingerprint { get; set; }
 }

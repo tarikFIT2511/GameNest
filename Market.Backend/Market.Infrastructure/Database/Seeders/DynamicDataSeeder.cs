@@ -3,15 +3,15 @@
 namespace Market.Infrastructure.Database.Seeders;
 
 /// <summary>
-/// Dynamic seeder koji se pokreće u runtime-u,
-/// obično pri startu aplikacije (npr. u Program.cs).
-/// Koristi se za unos demo/test podataka koji nisu dio migracije.
+/// Dynamic seeder executed at runtime,
+/// usually on application startup (e.g. in Program.cs).
+/// Used for inserting demo/test data that is not part of migrations.
 /// </summary>
 public static class DynamicDataSeeder
 {
     public static async Task SeedAsync(DatabaseContext context)
     {
-        // Osiguraj da baza postoji (bez migracija)
+        // Ensure database exists (without migrations)
         await context.Database.EnsureCreatedAsync();
 
         await SeedProductCategoriesAsync(context);
@@ -25,13 +25,13 @@ public static class DynamicDataSeeder
             context.ProductCategories.AddRange(
                 new ProductCategoryEntity
                 {
-                    Name = "Računari (demo)",
+                    Name = "Computers (demo)",
                     IsEnabled = true,
                     CreatedAt = DateTime.UtcNow
                 },
                 new ProductCategoryEntity
                 {
-                    Name = "Mobilni uređaji (demo)",
+                    Name = "Mobile devices (demo)",
                     IsEnabled = true,
                     CreatedAt = DateTime.UtcNow
                 }
@@ -43,7 +43,7 @@ public static class DynamicDataSeeder
     }
 
     /// <summary>
-    /// Kreira demo korisnike ako ih još nema u bazi.
+    /// Creates demo users if none exist in the database.
     /// </summary>
     private static async Task SeedUsersAsync(DatabaseContext context)
     {

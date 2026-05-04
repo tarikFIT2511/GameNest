@@ -1,11 +1,10 @@
 ﻿namespace Market.Features.Common;
 
 /// <summary>
-/// Bazna klasa za list upite sa paginacijom, pretragom i sortiranjem.
+/// Base class for list queries with pagination, search, and sorting.
 /// </summary>
 public abstract class BasePagedQuery<TItem> : IRequest<PageResult<TItem>>
 {
-    /// <summary>Parametri paginacije (stranica i veličina stranice).</summary>
+    /// <summary>Pagination parameters (page number and page size).</summary>
     public required PageRequest Paging { get; init; } = new();
-
 }

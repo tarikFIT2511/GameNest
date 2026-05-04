@@ -6,9 +6,9 @@ public partial class StaticDataSeeder
 
     public static void Seed(ModelBuilder modelBuilder)
     {
-        // statički podaci se dodaj u migraciju
-        // ako ne postoje u DB-u u trenutku kreiranja migracije
-        // primjer statičkih podataka su npr. uloge (roles)
+        // static data is added into migrations
+        // if it does not exist in the DB at the time the migration is created
+        // examples of static data are roles, etc.
         SeedProductCategories(modelBuilder);
     }
 
@@ -16,20 +16,20 @@ public partial class StaticDataSeeder
     {
         // todo: user roles
 
-        //modelBuilder.Entity<UserRoles>().HasData(new List<UserRoleEntity>
-        //{
-        //    new UserRoleEntity{
-        //        Id = 1,
-        //        Name = "Admin",
-        //        CreatedAt = dateTime,
-        //        ModifiedAt = null,
-        //    },
-        //    new UserRoleEntity{
-        //        Id = 2,
-        //        Name = "Employee",
-        //        CreatedAt = dateTime,
-        //        ModifiedAt = null,
-        //    },
-        //});
+        // modelBuilder.Entity<UserRoles>().HasData(new List<UserRoleEntity>
+        // {
+        //     new UserRoleEntity{
+        //         Id = 1,
+        //         Name = "Admin",
+        //         CreatedAt = dateTime,
+        //         ModifiedAt = null,
+        //     },
+        //     new UserRoleEntity{
+        //         Id = 2,
+        //         Name = "Employee",
+        //         CreatedAt = dateTime,
+        //         ModifiedAt = null,
+        //     },
+        // });
     }
 }

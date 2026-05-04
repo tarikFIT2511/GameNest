@@ -1,21 +1,21 @@
 ﻿// ================================================
-// Global using directives — zajednički za sve feature module
+// Global using directives 
 // ================================================
 
 global using MediatR;
 global using FluentValidation;
 global using Microsoft.EntityFrameworkCore;
 
-// Core sloj
+// Core layer
 global using Market.Core.Entities;
 global using Market.Core.Exceptions;
 
-// Infrastructure sloj
+// Infrastructure layer
 global using Market.Infrastructure.Database;
 
-// Shared sloj
+// Shared layer
 
-// Features.Common sloj
+// Features.Common layer
 global using Market.Features.Common;
 
 global using System.Text.Json.Serialization;

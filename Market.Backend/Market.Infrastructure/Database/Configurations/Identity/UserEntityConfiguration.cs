@@ -28,7 +28,7 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntit
         b.Property(x => x.IsEnabled)
             .HasDefaultValue(true);
 
-        // Navigacija
+        // Navigation
         b.HasMany(x => x.RefreshTokens)
             .WithOne(x => x.User)
             .HasForeignKey(x => x.UserId);
