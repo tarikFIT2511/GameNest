@@ -1,198 +1,96 @@
-﻿using Market.API.Controllers;
-using Market.Core.Security;
-using Market.Features.Common.Behaviors;
-using Market.Features.ProductCategories.Commands.Create;
-using Market.Infrastructure.Database.Seeders;
-using Market.Shared.Constants;
-using Market.Shared.Extensions;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.OpenApi.Models;
-using Microsoft.IdentityModel.Tokens;        // TokenValidationParameters, SymmetricSecurityKey
-using System.Text;                            // Encoding.UTF8.GetBytes(...)
+﻿using Market.API;
+using Market.API.Middlewares;
+using Market.Application;
+using Market.Infrastructure;
+using Serilog;
 
-// Potrebno za WebApplicationFactory u integracijskim testovima
-
-public partial class Program {
+public partial class Program
+{
     private static async Task Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        //
+        // 0) Bootstrap logger (very early, no full config yet)
+        //
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.Console() // minimal sink so we see startup errors
+            .CreateBootstrapLogger();
 
-        // ---------------------------------------------------------
-        // Services
-        // ---------------------------------------------------------
-        builder.Services
-            .AddControllers()
-            .ConfigureApiBehaviorOptions(opts =>
+        try
+        {
+            Log.Information("Starting Market API...");
+
+            //
+            // 1) Standard builder (includes appsettings.json, appsettings.{ENV}.json,
+            //    environment variables, user-secrets (Dev), and command-line args)
+            //
+            var builder = WebApplication.CreateBuilder(args);
+
+            // 2) Promote Serilog to full configuration from builder.Configuration
+            //    (reads "Serilog" section from appsettings + ENV overrides)
+            //
+            builder.Host.UseSerilog((ctx, services, cfg) =>
             {
-                // Standardizacija odgovora kada model binding/JSON parsing padne
-                opts.InvalidModelStateResponseFactory = ctx =>
-                {
-                    var msg = string.Join("; ",
-                        ctx.ModelState.Values.SelectMany(v => v.Errors)
-                                             .Select(e => string.IsNullOrWhiteSpace(e.ErrorMessage)
-                                                 ? "Validation error"
-                                                 : e.ErrorMessage));
-
-                    return new BadRequestObjectResult(new ErrorDto
-                    {
-                        Code = "validation.failed",
-                        Message = msg
-                    });
-                };
+                cfg.ReadFrom.Configuration(ctx.Configuration)   // Serilog section in appsettings
+                   .ReadFrom.Services(services)                 // DI enrichers if any
+                   .Enrich.FromLogContext()
+                   .Enrich.WithThreadId()
+                   .Enrich.WithProcessId()
+                   .Enrich.WithMachineName();
             });
 
-        builder.Services.AddOptions<JwtOptions>()
-            .Bind(builder.Configuration.GetSection("Jwt"))
-            .Validate(o => !string.IsNullOrWhiteSpace(o.Key), "Jwt:Key is missing.")
-            .Validate(o => !string.IsNullOrWhiteSpace(o.Issuer), "Jwt:Issuer is missing.")
-            .Validate(o => !string.IsNullOrWhiteSpace(o.Audience), "Jwt:Audience is missing.")
-            .ValidateOnStart();
+            // Optional: remove default providers to have only Serilog
+            builder.Logging.ClearProviders();
 
-        // after .AddOptions<JwtOptions>()...
-        builder.Services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            var jwtSection = builder.Configuration.GetSection("Jwt");
-            var key = jwtSection["Key"];
-            var issuer = jwtSection["Issuer"];
-            var audience = jwtSection["Audience"];
+            // ---------------------------------------------------------
+            // 3. Layer registrations
+            // ---------------------------------------------------------
+            builder.Services
+                .AddAPI(builder.Configuration, builder.Environment)
+                .AddInfrastructure(builder.Configuration, builder.Environment)
+                .AddApplication();
 
-            options.TokenValidationParameters = new TokenValidationParameters
+            var app = builder.Build();
+
+            // ---------------------------------------------------------
+            // 4. Middleware pipeline
+            // ---------------------------------------------------------
+            if (app.Environment.IsDevelopment())
             {
-                ValidateIssuer = true,
-                ValidIssuer = issuer,
-                ValidateAudience = true,
-                ValidAudience = audience,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            };
-        });
-
-        builder.Services.AddAuthorization(o =>
-        {
-            o.FallbackPolicy = new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .Build();
-        });
-
-        // FluentValidation — automatsko registrovanje svih validatora iz Features sklopa
-        builder.Services.AddValidatorsFromAssembly(typeof(CreateProductCategoryCommand).Assembly);
-
-        // Swagger/OpenAPI
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(c =>
-        {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Market API", Version = "v1" });
-
-            // XML komentari (ako koristiš)
-            var xml = Path.Combine(AppContext.BaseDirectory, "Market.API.xml");
-            if (File.Exists(xml)) c.IncludeXmlComments(xml, includeControllerXmlComments: true);
-
-            // JWT Bearer security definicija
-            var securityScheme = new OpenApiSecurityScheme
-            {
-                Name = "Authorization",
-                Description = "Unesi JWT token. Format: **Bearer {token}**",
-                In = ParameterLocation.Header,
-                Type = SecuritySchemeType.Http,
-                Scheme = "bearer",
-                BearerFormat = "JWT",
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            };
-            c.AddSecurityDefinition("Bearer", securityScheme);
-
-            // Globalni zahtjev: svi endpointi očekuju Bearer, osim onih s [AllowAnonymous]
-            var securityRequirement = new OpenApiSecurityRequirement
-            {
-                { securityScheme, Array.Empty<string>() }
-            };
-            c.AddSecurityRequirement(securityRequirement);
-        });
-
-        // DbContext (InMemory za IntegrationTests; SQL Server inače)
-        builder.Services.AddDbContext<DatabaseContext>(options =>
-        {
-            if (builder.Environment.IsIntegrationTests())
-            {
-                options.UseInMemoryDatabase("IntegrationTestsDb");
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
-            else
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString(ConfigurationValues.ConnectionString.Main));
-            }
-        });
 
-        // MediatR — registruj servise iz API i Features projekata
-        builder.Services.AddMediatR(cfg =>
-        {
-            cfg.RegisterServicesFromAssemblies(
-                typeof(ProductCategoryController).Assembly,           // Market.API
-                typeof(CreateProductCategoryCommand).Assembly         // Market.Features
-            );
-        });
+            // Global exception handler (IExceptionHandler)
+            app.UseExceptionHandler();
+            app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
-        // Pipeline behavior: FluentValidation pre MediatR handlera
-        builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-        builder.Services.AddTransient(typeof(IJwtTokenService), typeof(JwtTokenService));
+            app.UseHttpsRedirection();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
-        // Custom global exception middleware
-        builder.Services.AddTransient<ExceptionMiddleware>();
+            app.MapControllers();
 
-        var app = builder.Build();
+            // Database migrations + seeding
+            await app.Services.InitializeDatabaseAsync(app.Environment);
 
-        // ---------------------------------------------------------
-        // Middleware pipeline
-        // ---------------------------------------------------------
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            Log.Information("Market API started successfully.");
+            app.Run();
         }
-
-        app.UseMiddleware<ExceptionMiddleware>();
-
-        app.UseHttpsRedirection();
-        app.UseAuthentication();   // VAŽNO: prije Authorization
-        app.UseAuthorization();
-
-        app.MapControllers();
-
-        // ---------------------------------------------------------
-        // Dynamic seeding (runtime)
-        // - InMemory: EnsureCreated + uvijek seed (za testove)
-        // - SQL Server: Migrate + seed u Development
-        // ---------------------------------------------------------
-        await using (var scope = app.Services.CreateAsyncScope())
+        catch (HostAbortedException)
         {
-            var ctx = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-
-            if (app.Environment.IsIntegrationTests())
-            {
-                await ctx.Database.EnsureCreatedAsync();
-                await DynamicDataSeeder.SeedAsync(ctx);
-            }
-            else
-            {
-                await ctx.Database.MigrateAsync();
-
-                if (app.Environment.IsDevelopment())
-                {
-                    await DynamicDataSeeder.SeedAsync(ctx);
-                }
-            }
+            // EF Core tools abortiraju host nakon što uzmu DbContext.
+            // Ovo nije runtime greška – samo tiho izađi.
+            Log.Information("Host aborted by EF Core tooling (design-time) - its ok.");
         }
-
-        app.Run();
+        catch (Exception ex)
+        {
+            // Any startup failure will be logged here
+            Log.Fatal(ex, "Market API terminated unexpectedly.");
+        }
+        finally
+        {
+            // Ensure all logs are flushed before the app exits
+            Log.CloseAndFlush();
+        }
     }
 }

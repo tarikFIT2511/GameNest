@@ -1,4 +1,4 @@
-﻿using Market.Core.Entities.Base;
+﻿using Market.Domain.Common;
 using Market.Infrastructure.Database.Seeders;
 using System.Linq.Expressions;
 
@@ -6,36 +6,52 @@ namespace Market.Infrastructure.Database;
 
 public partial class DatabaseContext
 {
-    private void ModifyTimestamps()
+    private DateTime UtcNow => _clock.GetUtcNow().UtcDateTime;
+
+    private void ApplyAuditAndSoftDelete()
     {
-        var entries = ChangeTracker.Entries();
-
-        foreach (var entry in entries)
+        foreach (var entry in ChangeTracker.Entries<BaseEntity>())
         {
-            var entity = ((BaseEntity)entry.Entity);
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    entry.Entity.CreatedAtUtc = UtcNow;
+                    entry.Entity.ModifiedAtUtc = null; // ili = UtcNow
+                    entry.Entity.IsDeleted = false;
+                    break;
 
-            if (entry.State == EntityState.Added)
-            {
-                entity.CreatedAt = DateTime.Now;
-            }
-            else if (entry.State == EntityState.Modified)
-            {
-                entity.ModifiedAt = DateTime.Now;
+                case EntityState.Modified:
+                    entry.Entity.ModifiedAtUtc = UtcNow;
+                    break;
+
+                case EntityState.Deleted:
+                    // soft-delete: set is Modified and IsDeleted
+                    entry.State = EntityState.Modified;
+                    entry.Entity.IsDeleted = true;
+                    entry.Entity.ModifiedAtUtc = UtcNow;
+                    break;
             }
         }
     }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.Properties<decimal>().HavePrecision(18, 2);
+        configurationBuilder.Properties<decimal?>().HavePrecision(18, 2);
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         ApplyGlobalFielters(modelBuilder);
 
-        StaticDataSeeder.Seed(modelBuilder); // static records
+        StaticDataSeeder.Seed(modelBuilder); // static data
     }
 
     private void ApplyGlobalFielters(ModelBuilder modelBuilder)
     {
-        // Apply a global query filter to all entities that inherit from BaseEntity
+        // Apply a global filter to all entities inheriting from BaseEntity
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
             if (typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
@@ -53,14 +69,14 @@ public partial class DatabaseContext
 
     public override int SaveChanges()
     {
-        ModifyTimestamps();
+        ApplyAuditAndSoftDelete();
 
         return base.SaveChanges();
     }
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
     {
-        ModifyTimestamps();
+        ApplyAuditAndSoftDelete();
 
         return base.SaveChangesAsync(cancellationToken);
     }

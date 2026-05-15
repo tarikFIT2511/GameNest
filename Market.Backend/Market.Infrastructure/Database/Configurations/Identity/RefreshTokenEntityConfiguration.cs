@@ -1,4 +1,4 @@
-﻿namespace Market.Infrastructure.Database.Configurations;
+﻿namespace Market.Infrastructure.Database.Configurations.Identity;
 
 public sealed class RefreshTokenEntityConfiguration : IEntityTypeConfiguration<RefreshTokenEntity>
 {

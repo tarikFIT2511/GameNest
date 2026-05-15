@@ -1,17 +1,15 @@
-﻿using Microsoft.AspNetCore.Identity;
-
-namespace Market.Infrastructure.Database.Seeders;
+﻿namespace Market.Infrastructure.Database.Seeders;
 
 /// <summary>
-/// Dynamic seeder executed at runtime,
-/// usually on application startup (e.g. in Program.cs).
-/// Used for inserting demo/test data that is not part of migrations.
+/// Dynamic seeder koji se pokreće u runtime-u,
+/// obično pri startu aplikacije (npr. u Program.cs).
+/// Koristi se za unos demo/test podataka koji nisu dio migracije.
 /// </summary>
 public static class DynamicDataSeeder
 {
     public static async Task SeedAsync(DatabaseContext context)
     {
-        // Ensure database exists (without migrations)
+        // Osiguraj da baza postoji (bez migracija)
         await context.Database.EnsureCreatedAsync();
 
         await SeedProductCategoriesAsync(context);
@@ -25,15 +23,15 @@ public static class DynamicDataSeeder
             context.ProductCategories.AddRange(
                 new ProductCategoryEntity
                 {
-                    Name = "Computers (demo)",
+                    Name = "Računari (demo)",
                     IsEnabled = true,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAtUtc = DateTime.UtcNow
                 },
                 new ProductCategoryEntity
                 {
-                    Name = "Mobile devices (demo)",
+                    Name = "Mobilni uređaji (demo)",
                     IsEnabled = true,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAtUtc = DateTime.UtcNow
                 }
             );
 
@@ -43,32 +41,46 @@ public static class DynamicDataSeeder
     }
 
     /// <summary>
-    /// Creates demo users if none exist in the database.
+    /// Kreira demo korisnike ako ih još nema u bazi.
     /// </summary>
     private static async Task SeedUsersAsync(DatabaseContext context)
     {
         if (await context.Users.AnyAsync())
             return;
 
-        var hasher = new PasswordHasher<UserEntity>();
+        var hasher = new PasswordHasher<MarketUserEntity>();
 
-        var admin = new UserEntity
+        var admin = new MarketUserEntity
         {
             Email = "admin@market.local",
             PasswordHash = hasher.HashPassword(null!, "Admin123!"),
-            Role = "Admin",
+            IsAdmin = true,
             IsEnabled = true,
         };
 
-        var user = new UserEntity
+        var user = new MarketUserEntity
         {
-            Email = "user@market.local",
+            Email = "manager@market.local",
             PasswordHash = hasher.HashPassword(null!, "User123!"),
-            Role = "User",
+            IsManager = true,
             IsEnabled = true,
         };
 
-        context.Users.AddRange(admin, user);
+        var dummyForSwagger = new MarketUserEntity
+        {
+            Email = "string",
+            PasswordHash = hasher.HashPassword(null!, "string"),
+            IsEmployee = true,
+            IsEnabled = true,
+        };
+        var dummyForTests = new MarketUserEntity
+        {
+            Email = "test",
+            PasswordHash = hasher.HashPassword(null!, "test123"),
+            IsEmployee = true,
+            IsEnabled = true,
+        };
+        context.Users.AddRange(admin, user, dummyForSwagger, dummyForTests);
         await context.SaveChangesAsync();
 
         Console.WriteLine("✅ Dynamic seed: demo users added.");
