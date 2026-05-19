@@ -1,8 +1,8 @@
 ﻿namespace Market.Infrastructure.Database.Configurations.Identity;
 
-public sealed class UserEntityConfiguration : IEntityTypeConfiguration<MarketUserEntity>
+public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntity>
 {
-    public void Configure(EntityTypeBuilder<MarketUserEntity> b)
+    public void Configure(EntityTypeBuilder<UserEntity> b)
     {
         b.ToTable("Users");
 
@@ -22,10 +22,10 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<MarketUse
         b.Property(x => x.IsAdmin)
             .HasDefaultValue(false);
 
-        b.Property(x => x.IsManager)
+        b.Property(x => x.isDeveloper)
             .HasDefaultValue(false);
 
-        b.Property(x => x.IsEmployee)
+        b.Property(x => x.isRegular)
             .HasDefaultValue(true); // Default: regular user
 
         b.Property(x => x.TokenVersion)
