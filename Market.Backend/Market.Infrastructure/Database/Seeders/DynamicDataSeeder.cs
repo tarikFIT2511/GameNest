@@ -52,32 +52,32 @@ public static class DynamicDataSeeder
 
         var admin = new UserEntity
         {
+            Username = "admin123",
             Email = "admin@market.local",
             PasswordHash = hasher.HashPassword(null!, "Admin123!"),
-            IsAdmin = true,
             IsEnabled = true,
         };
 
         var user = new UserEntity
         {
+            Username = "user123",
             Email = "manager@market.local",
             PasswordHash = hasher.HashPassword(null!, "User123!"),
-            isDeveloper = true,
             IsEnabled = true,
         };
 
         var dummyForSwagger = new UserEntity
         {
+            Username = "string",
             Email = "string",
             PasswordHash = hasher.HashPassword(null!, "string"),
-            isRegular = true,
             IsEnabled = true,
         };
         var dummyForTests = new UserEntity
         {
+            Username = "test",
             Email = "test",
             PasswordHash = hasher.HashPassword(null!, "test123"),
-            isRegular = true,
             IsEnabled = true,
         };
         context.Users.AddRange(admin, user, dummyForSwagger, dummyForTests);

@@ -18,16 +18,6 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntit
         b.Property(x => x.PasswordHash)
             .IsRequired();
 
-        // Roles
-        b.Property(x => x.IsAdmin)
-            .HasDefaultValue(false);
-
-        b.Property(x => x.isDeveloper)
-            .HasDefaultValue(false);
-
-        b.Property(x => x.isRegular)
-            .HasDefaultValue(true); // Default: regular user
-
         b.Property(x => x.TokenVersion)
             .HasDefaultValue(0);
 

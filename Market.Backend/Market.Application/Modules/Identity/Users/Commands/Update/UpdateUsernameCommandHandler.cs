@@ -1,12 +1,12 @@
 ﻿namespace Market.Application.Modules.Catalog.ProductCategories.Commands.Update;
 
-public sealed class UpdateUserCommandHandler(IAppDbContext ctx)
-            : IRequestHandler<UpdateUserCommand, Unit>
+public sealed class UpdateUsernameCommandHandler(IAppDbContext ctx)
+            : IRequestHandler<UpdateUsernameCommand, Unit>
 {
-    public async Task<Unit> Handle(UpdateUserCommand request, CancellationToken ct)
+    public async Task<Unit> Handle(UpdateUsernameCommand request, CancellationToken ct)
     {
         var user = await ctx.Users
-            .Where(x => x.Id == request.Id)  //not finished
+            .Where(x => x.Id == request.Id) 
             .FirstOrDefaultAsync(ct);
 
         if (user == null)
@@ -22,7 +22,7 @@ public sealed class UpdateUserCommandHandler(IAppDbContext ctx)
         }
 
         user.Username = request.Username.Trim();
-
+        user.ModifiedAtUtc = DateTime.UtcNow;
         await ctx.SaveChangesAsync(ct);
 
         return Unit.Value;
