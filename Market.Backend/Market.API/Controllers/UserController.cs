@@ -1,13 +1,10 @@
-using Market.Application.Modules.Catalog.ProductCategories.Commands.Delete;
-using Market.Application.Modules.Catalog.ProductCategories.Commands.Status.Disable;
-using Market.Application.Modules.Catalog.ProductCategories.Commands.Status.Enable;
-using Market.Application.Modules.Catalog.ProductCategories.Commands.Create;
-using Market.Application.Modules.Catalog.ProductCategories.Commands.Update;
-using Market.Application.Modules.Catalog.ProductCategories.Queries.GetById;
-using Market.Application.Modules.Catalog.ProductCategories.Queries.List;
+using Market.Application.Modules.Identity.Users.Commands.Status.Enable;
+using Market.Application.Modules.Identity.Users.Commands.Update;
 using Market.Application.Modules.Identity.Users.Commands.Create;
 using Market.Application.Modules.Identity.Users.Commands.Delete;
-using Market.Application.Modules.Identity.User.Commands.Status.Disable;
+using Market.Application.Modules.Identity.Users.Commands.Status.Disable;
+using Market.Application.Modules.Identity.Users.Queries.GetById;
+using Market.Application.Modules.Identity.Users.Queries.List;
 
 namespace Market.API.Controllers;
 
@@ -16,7 +13,7 @@ namespace Market.API.Controllers;
 [AllowAnonymous]
 public class UserController(ISender sender) : ControllerBase
 {
-    [HttpPost]  //tested successfully
+    [HttpPost] 
     public async Task<ActionResult<int>> CreateUser(CreateUserCommand command, CancellationToken ct)
     {
         int id = await sender.Send(command, ct);
@@ -24,32 +21,49 @@ public class UserController(ISender sender) : ControllerBase
         return Ok(id);
     }
 
-    [HttpPut("{id:int}")] //not finished
-    public async Task Update(int id, UpdateUsernameCommand command, CancellationToken ct)
+    [HttpPut("{id:int}/username")]
+    public async Task UpdateUsername(int id, UpdateUsernameCommand command, CancellationToken ct)
     {
-        // ID from the route takes precedence
         command.Id = id;
         await sender.Send(command, ct);
-        // no return -> 204 No Content
     }
 
-    [HttpDelete("{id:int}")] //tested successfully
+    [HttpPut("{id:int}/email")]
+    public async Task UpdateEmail(int id, UpdateUserEmailCommand command, CancellationToken ct)
+    {
+        command.Id = id;
+        await sender.Send(command, ct);
+    }
+
+    [HttpDelete("{id:int}")]
     public async Task Delete(int id, CancellationToken ct)
     {
         await sender.Send(new DeleteUserCommand { Id = id }, ct);
     }
 
-    [HttpPut("{id:int}/disable")] //tested successfully
+    [HttpGet("{id:int}")]
+    public async Task<GetUserByIdQueryDto> GetById(int id, CancellationToken ct)
+    {
+        var user = await sender.Send(new GetUserByIdQuery { Id = id }, ct);
+        return user; // if NotFoundException -> 404 via middleware
+    }
+
+    [HttpGet("/UsersList")]
+    public async Task<PageResult<ListUsersQueryDto>> List([FromQuery] ListUsersQuery query, CancellationToken ct)
+    {
+        var result = await sender.Send(query, ct);
+        return result;
+    }
+
+    [HttpPut("{id:int}/disable")]
     public async Task Disable(int id, CancellationToken ct)
     {
         await sender.Send(new DisableUserCommand { Id = id }, ct);
-        // no return -> 204 No Content
     }
 
-    [HttpPut("{id:int}/enable")] //tested successfully
+    [HttpPut("{id:int}/enable")]
     public async Task Enable(int id, CancellationToken ct)
     {
         await sender.Send(new EnableUserCommand { Id = id }, ct);
-        // no return -> 204 No Content
     }
 }

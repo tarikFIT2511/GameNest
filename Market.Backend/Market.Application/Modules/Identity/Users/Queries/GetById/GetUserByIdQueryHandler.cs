@@ -1,24 +1,28 @@
-﻿namespace Market.Application.Modules.Catalog.ProductCategories.Queries.GetById;
+﻿using Market.Application.Modules.Identity.Users.Queries.GetById;
 
-public class GetUserByIdQueryHandler(IAppDbContext context) : IRequestHandler<GetProductCategoryByIdQuery, GetProductCategoryByIdQueryDto>
+namespace Market.Application.ModulesIdentity.Users.Queries.GetById;
+
+public class GetUserByIdQueryHandler(IAppDbContext context) : IRequestHandler<GetUserByIdQuery, GetUserByIdQueryDto>
 {
-    public async Task<GetProductCategoryByIdQueryDto> Handle(GetProductCategoryByIdQuery request, CancellationToken cancellationToken)
+    public async Task<GetUserByIdQueryDto> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
     {
-        var category = await context.ProductCategories
+        var user = await context.Users
             .Where(c => c.Id == request.Id)
-            .Select(x => new GetProductCategoryByIdQueryDto
+            .Select(x => new GetUserByIdQueryDto
             {
                 Id = x.Id,
-                Name = x.Name,
+                Username = x.Username,
+                Email = x.Email,
+                CreatedAtUtc = x.CreatedAtUtc,
                 IsEnabled = x.IsEnabled
             })
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (category == null)
+        if (user == null)
         {
-            throw new MarketNotFoundException($"Product category with Id {request.Id} not found.");
+            throw new MarketNotFoundException($"User with Id {request.Id} not found.");
         }
 
-        return category;
+        return user;
     }
 }

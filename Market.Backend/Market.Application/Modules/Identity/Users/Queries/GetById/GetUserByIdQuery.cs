@@ -1,6 +1,6 @@
-﻿namespace Market.Application.Modules.Catalog.ProductCategories.Queries.GetById;
+﻿namespace Market.Application.Modules.Identity.Users.Queries.GetById;
 
-public class GetUserByIdQuery : IRequest<GetProductCategoryByIdQueryDto>
+public class GetUserByIdQuery : IRequest<GetUserByIdQueryDto>
 {
     public int Id { get; set; }
 }

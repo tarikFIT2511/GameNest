@@ -1,4 +1,4 @@
-﻿namespace Market.Application.Modules.Catalog.ProductCategories.Commands.Update;
+﻿namespace Market.Application.Modules.Identity.Users.Commands.Update;
 
 public sealed class UpdateUserEmailCommandHandler(IAppDbContext ctx)
             : IRequestHandler<UpdateUserEmailCommand, Unit>

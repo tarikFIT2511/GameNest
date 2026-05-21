@@ -1,4 +1,4 @@
-﻿namespace Market.Application.Modules.Identity.User.Commands.Status.Disable;
+﻿namespace Market.Application.Modules.Identity.Users.Commands.Status.Disable;
 
 public sealed class DisableUserCommand : IRequest<Unit>
 {

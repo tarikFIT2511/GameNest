@@ -1,4 +1,4 @@
-﻿namespace Market.Application.Modules.Catalog.ProductCategories.Commands.Status.Enable;
+﻿namespace Market.Application.Modules.Identity.Users.Commands.Status.Enable;
 
 public sealed class EnableUserCommand : IRequest<Unit>
 {
