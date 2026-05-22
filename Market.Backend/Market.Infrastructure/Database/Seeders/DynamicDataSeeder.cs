@@ -1,4 +1,6 @@
-﻿namespace Market.Infrastructure.Database.Seeders;
+﻿using Market.Domain.Enums;
+
+namespace Market.Infrastructure.Database.Seeders;
 
 /// <summary>
 /// Dynamic seeder koji se pokreće u runtime-u,
@@ -80,9 +82,27 @@ public static class DynamicDataSeeder
             PasswordHash = hasher.HashPassword(null!, "test123"),
             IsEnabled = true,
         };
+
+        //profili
+
+        admin.Profile = CreateDummyProfile();
+        user.Profile = CreateDummyProfile();
+        dummyForSwagger.Profile = CreateDummyProfile();
+        dummyForTests.Profile = CreateDummyProfile();
+
         context.Users.AddRange(admin, user, dummyForSwagger, dummyForTests);
         await context.SaveChangesAsync();
 
         Console.WriteLine("✅ Dynamic seed: demo users added.");
+    }
+    private static UserProfileEntity CreateDummyProfile()
+    {
+        return new UserProfileEntity
+        {
+            Country = Country.BosniaAndHerzegovina,
+            AvatarUrl = "",
+            Bio = "",
+            CreatedAtUtc = DateTime.UtcNow
+        };
     }
 }

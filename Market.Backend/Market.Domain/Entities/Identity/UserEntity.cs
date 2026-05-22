@@ -10,6 +10,7 @@ public sealed class UserEntity : BaseEntity
     public string PasswordHash { get; set; }
     public int TokenVersion { get; set; } = 0;// For global revocation
     public bool IsEnabled { get; set; }
+    public UserProfileEntity? Profile { get; set; }//for UserProfileEntity
     public ICollection<RefreshTokenEntity> RefreshTokens { get; private set; } = new List<RefreshTokenEntity>();
     public static class Constraints
     {

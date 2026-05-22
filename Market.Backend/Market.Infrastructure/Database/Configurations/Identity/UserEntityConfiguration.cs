@@ -28,5 +28,8 @@ public sealed class UserEntityConfiguration : IEntityTypeConfiguration<UserEntit
         b.HasMany(x => x.RefreshTokens)
             .WithOne(x => x.User)
             .HasForeignKey(x => x.UserId);
+
+        b.HasOne(x => x.Profile)
+            .WithOne(x => x.User);
     }
 }

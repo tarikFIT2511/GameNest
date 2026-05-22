@@ -13,10 +13,10 @@ public class CreateUserCommandHandler(IAppDbContext context)
             throw new ValidationException("Username is required.");
 
         if (string.IsNullOrWhiteSpace(email))
-            throw new ValidationException("Username is required.");
+            throw new ValidationException("Email is required.");
 
         if (string.IsNullOrWhiteSpace(password))
-            throw new ValidationException("Username is required.");
+            throw new ValidationException("Password is required.");
 
         // Check if a user with the same name or email already exists.
         bool usernameExists = await context.Users
@@ -33,7 +33,7 @@ public class CreateUserCommandHandler(IAppDbContext context)
             throw new MarketConflictException("Email already exists.");
         }
 
-        var user = new UserEntity
+        var user = new UserEntity 
         {
             Username = username!,
             Email = email!,
@@ -41,6 +41,14 @@ public class CreateUserCommandHandler(IAppDbContext context)
             IsEnabled = true, // default IsEnabled
             CreatedAtUtc = DateTime.UtcNow
         };
+        var profile = new UserProfileEntity
+        {
+            Country = request.Country,
+            AvatarUrl = "",
+            Bio = ""
+        };
+
+        user.Profile = profile;
 
         context.Users.Add(user);
         await context.SaveChangesAsync(cancellationToken);

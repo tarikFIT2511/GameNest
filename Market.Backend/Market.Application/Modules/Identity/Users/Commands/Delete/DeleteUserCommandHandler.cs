@@ -6,6 +6,7 @@ public class DeleteUserCommandHandler(IAppDbContext context)
     public async Task<Unit> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
     {
         var user = await context.Users
+            .Include(x => x.Profile)
             .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
         if (user is null)
@@ -15,6 +16,10 @@ public class DeleteUserCommandHandler(IAppDbContext context)
             throw new MarketConflictException("User is already deleted.");
 
         user.IsDeleted = true; // Soft delete
+        if (user.Profile != null)
+        {
+            user.Profile.IsDeleted = true;
+        }
         user.ModifiedAtUtc = DateTime.UtcNow;
         await context.SaveChangesAsync(cancellationToken);
 
