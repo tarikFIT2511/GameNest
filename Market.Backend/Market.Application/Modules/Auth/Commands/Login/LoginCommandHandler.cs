@@ -1,9 +1,7 @@
 ﻿using Market.Application.Modules.Auth.Commands.Login;
 
-public sealed class LoginCommandHandler(
-    IAppDbContext ctx,
-    IJwtTokenService jwt,
-    IPasswordHasher<MarketUserEntity> hasher)
+public sealed class LoginCommandHandler(IAppDbContext ctx,IJwtTokenService jwt,
+    IPasswordHasher<UserEntity> hasher)
     : IRequestHandler<LoginCommand, LoginCommandDto>
 {
     public async Task<LoginCommandDto> Handle(LoginCommand request, CancellationToken ct)

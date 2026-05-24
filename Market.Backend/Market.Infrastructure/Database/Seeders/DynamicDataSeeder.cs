@@ -1,4 +1,6 @@
-﻿namespace Market.Infrastructure.Database.Seeders;
+﻿using Market.Domain.Enums;
+
+namespace Market.Infrastructure.Database.Seeders;
 
 /// <summary>
 /// Dynamic seeder koji se pokreće u runtime-u,
@@ -48,41 +50,59 @@ public static class DynamicDataSeeder
         if (await context.Users.AnyAsync())
             return;
 
-        var hasher = new PasswordHasher<MarketUserEntity>();
+        var hasher = new PasswordHasher<UserEntity>();
 
-        var admin = new MarketUserEntity
+        var admin = new UserEntity
         {
+            Username = "admin123",
             Email = "admin@market.local",
             PasswordHash = hasher.HashPassword(null!, "Admin123!"),
-            IsAdmin = true,
             IsEnabled = true,
         };
 
-        var user = new MarketUserEntity
+        var user = new UserEntity
         {
+            Username = "user123",
             Email = "manager@market.local",
             PasswordHash = hasher.HashPassword(null!, "User123!"),
-            IsManager = true,
             IsEnabled = true,
         };
 
-        var dummyForSwagger = new MarketUserEntity
+        var dummyForSwagger = new UserEntity
         {
+            Username = "string",
             Email = "string",
             PasswordHash = hasher.HashPassword(null!, "string"),
-            IsEmployee = true,
             IsEnabled = true,
         };
-        var dummyForTests = new MarketUserEntity
+        var dummyForTests = new UserEntity
         {
+            Username = "test",
             Email = "test",
             PasswordHash = hasher.HashPassword(null!, "test123"),
-            IsEmployee = true,
             IsEnabled = true,
         };
+
+        //profili
+
+        admin.Profile = CreateDummyProfile();
+        user.Profile = CreateDummyProfile();
+        dummyForSwagger.Profile = CreateDummyProfile();
+        dummyForTests.Profile = CreateDummyProfile();
+
         context.Users.AddRange(admin, user, dummyForSwagger, dummyForTests);
         await context.SaveChangesAsync();
 
         Console.WriteLine("✅ Dynamic seed: demo users added.");
+    }
+    private static UserProfileEntity CreateDummyProfile()
+    {
+        return new UserProfileEntity
+        {
+            Country = Country.BosniaAndHerzegovina,
+            AvatarUrl = "",
+            Bio = "",
+            CreatedAtUtc = DateTime.UtcNow
+        };
     }
 }
