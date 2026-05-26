@@ -58,7 +58,7 @@ public class GetUserProfileByIdQueryHandler(IAppDbContext context)
                 break;
 
             default:
-                throw new MarketNotFoundException("Error with ProfileViewType.");
+                throw new ArgumentOutOfRangeException(nameof(request.Type));
         }
 
         return dto;
