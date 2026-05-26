@@ -3,6 +3,8 @@ using Market.Application.Modules.Sales.Coupons.Commands.Delete;
 using Market.Application.Modules.Sales.Coupons.Commands.Status.Disable;
 using Market.Application.Modules.Sales.Coupons.Commands.Status.Enable;
 using Market.Application.Modules.Sales.Coupons.Commands.Update;
+using Market.Application.Modules.Sales.Coupons.Queries.GetById;
+using Market.Application.Modules.Sales.Coupons.Queries.List;
 
 namespace Market.API.Controllers;
 
@@ -32,19 +34,19 @@ public class CouponController(ISender sender) : ControllerBase
         await sender.Send(new DeleteCouponCommand { Id = id }, ct);
     }
 
-    //[HttpGet("{id:int}")]
-    //public async Task<GetCouponByIdQueryDto> GetById(int id, CancellationToken ct)
-    //{
-    //    var user = await sender.Send(new GetCouponByIdQuery { Id = id }, ct);
-    //    return user; // if NotFoundException -> 404 via middleware
-    //}
+    [HttpGet("{id:int}")]
+    public async Task<GetCouponByIdQueryDto> GetById(int id, CancellationToken ct)
+    {
+        var user = await sender.Send(new GetCouponByIdQuery { Id = id }, ct);
+        return user; // if NotFoundException -> 404 via middleware
+    }
 
-    //[HttpGet("/CouuponsList")]
-    //public async Task<PageResult<ListCouponsQueryDto>> List([FromQuery] ListCouponsQuery query, CancellationToken ct)
-    //{
-    //    var result = await sender.Send(query, ct);
-    //    return result;
-    //}
+    [HttpGet("/CouponsList")]
+    public async Task<PageResult<ListCouponsQueryDto>> List([FromQuery] ListCouponsQuery query, CancellationToken ct)
+    {
+        var result = await sender.Send(query, ct);
+        return result;
+    }
 
     [HttpPut("{id:int}/disable")]
     public async Task Disable(int id, CancellationToken ct)
