@@ -12,6 +12,8 @@ public partial class DatabaseContext : DbContext, IAppDbContext
     public DbSet<CouponEntity> Coupons => Set<CouponEntity>();
     public DbSet<RefreshTokenEntity> RefreshTokens => Set<RefreshTokenEntity>();
 
+    public DbSet<GameEntity> Games => Set<GameEntity>();
+
     private readonly TimeProvider _clock;
     public DatabaseContext(DbContextOptions<DatabaseContext> options, TimeProvider clock) : base(options)
     {

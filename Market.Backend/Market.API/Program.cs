@@ -3,6 +3,7 @@ using Market.API.Middlewares;
 using Market.Application;
 using Market.Infrastructure;
 using Serilog;
+using Microsoft.EntityFrameworkCore;
 
 public partial class Program
 {

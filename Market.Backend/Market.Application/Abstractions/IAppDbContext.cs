@@ -10,6 +10,8 @@ public interface IAppDbContext
     DbSet<UserEntity> Users { get; }
     DbSet<CouponEntity> Coupons { get; }
     DbSet<RefreshTokenEntity> RefreshTokens { get; }
+    DbSet<GameEntity> Games { get; }
+    DbSet<UserProfileEntity> UserProfiles { get; }
 
     Task<int> SaveChangesAsync(CancellationToken ct);
 }
