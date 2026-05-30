@@ -9,27 +9,32 @@ public partial class StaticDataSeeder
         // Static data is added in the migration
         // if it does not exist in the DB at the time of creating the migration
         // example of static data: roles
-        SeedProductCategories(modelBuilder);
+        SeedData(modelBuilder);
     }
 
-    private static void SeedProductCategories(ModelBuilder modelBuilder)
+    private static void SeedData(ModelBuilder modelBuilder)
     {
-        // todo: user roles
-
-        //modelBuilder.Entity<UserRoles>().HasData(new List<UserRoleEntity>
-        //{
-        //    new UserRoleEntity{
-        //        Id = 1,
-        //        Name = "Admin",
-        //        CreatedAt = dateTime,
-        //        ModifiedAt = null,
-        //    },
-        //    new UserRoleEntity{
-        //        Id = 2,
-        //        Name = "Employee",
-        //        CreatedAt = dateTime,
-        //        ModifiedAt = null,
-        //    },
-        //});
+        //roles
+        modelBuilder.Entity<RoleEntity>().HasData(new List<RoleEntity>
+        {
+            new RoleEntity{
+                Id = 1,
+                Name = "Admin",
+                CreatedAtUtc = DateTime.UtcNow,
+                ModifiedAtUtc = null,
+            },
+            new RoleEntity{
+                Id = 2,
+                Name = "Developer",
+                CreatedAtUtc = DateTime.UtcNow,
+                ModifiedAtUtc = null,
+            },
+            new RoleEntity{
+                Id = 3,
+                Name = "Customer",
+                CreatedAtUtc = DateTime.UtcNow,
+                ModifiedAtUtc = null,
+            },
+        });
     }
 }
