@@ -46,9 +46,10 @@ public partial class DatabaseContext
 
         ApplyGlobalFielters(modelBuilder);
 
-        StaticDataSeeder.Seed(modelBuilder); // static data
-    }
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(DatabaseContext).Assembly);
 
+        StaticDataSeeder.Seed(modelBuilder); 
+    }
     private void ApplyGlobalFielters(ModelBuilder modelBuilder)
     {
         // Apply a global filter to all entities inheriting from BaseEntity

@@ -37,8 +37,8 @@ public class CouponController(ISender sender) : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<GetCouponByIdQueryDto> GetById(int id, CancellationToken ct)
     {
-        var user = await sender.Send(new GetCouponByIdQuery { Id = id }, ct);
-        return user; // if NotFoundException -> 404 via middleware
+        var coupon = await sender.Send(new GetCouponByIdQuery { Id = id }, ct);
+        return coupon; // if NotFoundException -> 404 via middleware
     }
 
     [HttpGet("/CouponsList")]
