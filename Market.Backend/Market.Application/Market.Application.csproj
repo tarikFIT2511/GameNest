@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Modules\Catalog\ProductCategories\Commands\Delete\" />
     <Folder Include="Modules\Identity\UserProfiles\Queries\" />
   </ItemGroup>
 

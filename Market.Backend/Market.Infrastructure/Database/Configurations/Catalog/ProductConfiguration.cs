@@ -1,4 +1,4 @@
-﻿namespace Market.Infrastructure.Database.Configurations.Catelog;
+﻿namespace Market.Infrastructure.Database.Configurations.Catalog;
 
 public class ProductConfiguration : IEntityTypeConfiguration<ProductEntity>
 {

@@ -11,6 +11,7 @@ public interface IAppDbContext
     DbSet<CouponEntity> Coupons { get; }
     DbSet<RoleEntity> Roles { get; }
     DbSet<UserRoleEntity> UserRoles { get; }
+    DbSet<ReviewEntity> Reviews { get; }
     DbSet<RefreshTokenEntity> RefreshTokens { get; }
     DbSet<GameEntity> Games { get; }
     DbSet<UserProfileEntity> UserProfiles { get; }
