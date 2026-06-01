@@ -8,10 +8,10 @@
 //    {
 //        var q = ctx.ProductCategories.AsNoTracking();
 
-//        if (!string.IsNullOrWhiteSpace(request.Search))
-//        {
-//            q = q.Where(x => x.Name.Contains(request.Search!));
-//        }
+        if (!string.IsNullOrWhiteSpace(request.Search))
+        {
+            q = q.Where(x => x.Name.Contains(request.Search!));
+        }
 
 //        if (request.OnlyEnabled is not null)
 //            q = q.Where(x => x.IsEnabled == request.OnlyEnabled);
