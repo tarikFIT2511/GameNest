@@ -1,11 +1,10 @@
-using Market.Application.Modules.Identity.Users.Commands.Status.Enable;
-using Market.Application.Modules.Identity.Users.Commands.Update;
 using Market.Application.Modules.Identity.Users.Commands.Create;
+using Market.Application.Modules.Identity.Users.Commands.Update;
 using Market.Application.Modules.Identity.Users.Commands.Delete;
+using Market.Application.Modules.Identity.Users.Commands.Status.Enable;
 using Market.Application.Modules.Identity.Users.Commands.Status.Disable;
 using Market.Application.Modules.Identity.Users.Queries.GetById;
 using Market.Application.Modules.Identity.Users.Queries.List;
-using Market.Application.Modules.Identity.UserRoles.Commands.Create;
 
 namespace Market.API.Controllers;
 
