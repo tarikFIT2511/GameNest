@@ -189,7 +189,7 @@ namespace Market.Infrastructure.Migrations
                     b.ToTable("Reviews", (string)null);
                 });
 
-            modelBuilder.Entity("Market.Domain.Entities.Identity.RefreshTokenEntity", b =>
+            modelBuilder.Entity("Market.Domain.Entities.Identity.RoleEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -200,7 +200,10 @@ namespace Market.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("ExpiresAtUtc")
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Fingerprint")
