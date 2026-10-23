@@ -1,4 +1,4 @@
-﻿using Market.Domain.Entities.Sales;
+﻿using Market.Domain.Entities.Identity;
 
 namespace Market.Infrastructure.Database.Configurations.Sales;
 

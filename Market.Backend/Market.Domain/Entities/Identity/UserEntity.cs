@@ -14,6 +14,8 @@ public sealed class UserEntity : BaseEntity
     public ICollection<RefreshTokenEntity> RefreshTokens { get; private set; } = new List<RefreshTokenEntity>();
     public ICollection<UserRoleEntity> UserRoles { get; private set; }
     = new List<UserRoleEntity>();
+    public ICollection<ModerationActionEntity> ActionsReceived { get; private set; }
+    = new List<ModerationActionEntity>();
     public static class Constraints
     {
         public const int UsernameMaxLength = 30;
