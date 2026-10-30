@@ -1,4 +1,5 @@
-﻿namespace Market.Infrastructure.Database.Configurations.Identity;
+﻿
+namespace Market.Infrastructure.Database.Configurations.Identity;
 
 public sealed class ModerationActionEntityConfiguration : IEntityTypeConfiguration<ModerationActionEntity>
 {
@@ -13,14 +14,16 @@ public sealed class ModerationActionEntityConfiguration : IEntityTypeConfigurati
             .IsRequired();
 
         b.Property(x => x.Reason)
-            .IsRequired();
+            .IsRequired(false);
 
         b.HasOne(x => x.AdminUser)
             .WithMany()
-            .HasForeignKey(x => x.AdminUserId);
+            .HasForeignKey(x => x.AdminUserId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         b.HasOne(x => x.TargetUser)
             .WithMany(x => x.ActionsReceived)
-            .HasForeignKey(x => x.TargetUserId);
+            .HasForeignKey(x => x.TargetUserId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

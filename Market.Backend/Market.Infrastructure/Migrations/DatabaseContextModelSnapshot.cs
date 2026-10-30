@@ -189,6 +189,45 @@ namespace Market.Infrastructure.Migrations
                     b.ToTable("Reviews", (string)null);
                 });
 
+            modelBuilder.Entity("Market.Domain.Entities.Identity.ModerationActionEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActionType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("AdminUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("ModifiedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TargetUserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdminUserId");
+
+                    b.HasIndex("TargetUserId");
+
+                    b.ToTable("ModerationActions", (string)null);
+                });
+
             modelBuilder.Entity("Market.Domain.Entities.Identity.RefreshTokenEntity", b =>
                 {
                     b.Property<int>("Id")
@@ -272,21 +311,21 @@ namespace Market.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAtUtc = new DateTime(2026, 6, 1, 15, 18, 36, 874, DateTimeKind.Utc).AddTicks(9216),
+                            CreatedAtUtc = new DateTime(2026, 10, 30, 18, 46, 7, 775, DateTimeKind.Utc).AddTicks(1091),
                             IsDeleted = false,
                             Name = "Admin"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAtUtc = new DateTime(2026, 6, 1, 15, 18, 36, 874, DateTimeKind.Utc).AddTicks(9222),
+                            CreatedAtUtc = new DateTime(2026, 10, 30, 18, 46, 7, 775, DateTimeKind.Utc).AddTicks(1101),
                             IsDeleted = false,
                             Name = "Developer"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAtUtc = new DateTime(2026, 6, 1, 15, 18, 36, 874, DateTimeKind.Utc).AddTicks(9224),
+                            CreatedAtUtc = new DateTime(2026, 10, 30, 18, 46, 7, 775, DateTimeKind.Utc).AddTicks(1107),
                             IsDeleted = false,
                             Name = "Customer"
                         });
@@ -485,6 +524,25 @@ namespace Market.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Market.Domain.Entities.Identity.ModerationActionEntity", b =>
+                {
+                    b.HasOne("Market.Domain.Entities.Identity.UserEntity", "AdminUser")
+                        .WithMany()
+                        .HasForeignKey("AdminUserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Market.Domain.Entities.Identity.UserEntity", "TargetUser")
+                        .WithMany("ActionsReceived")
+                        .HasForeignKey("TargetUserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("AdminUser");
+
+                    b.Navigation("TargetUser");
+                });
+
             modelBuilder.Entity("Market.Domain.Entities.Identity.RefreshTokenEntity", b =>
                 {
                     b.HasOne("Market.Domain.Entities.Identity.UserEntity", "User")
@@ -543,6 +601,8 @@ namespace Market.Infrastructure.Migrations
 
             modelBuilder.Entity("Market.Domain.Entities.Identity.UserEntity", b =>
                 {
+                    b.Navigation("ActionsReceived");
+
                     b.Navigation("Profile");
 
                     b.Navigation("RefreshTokens");

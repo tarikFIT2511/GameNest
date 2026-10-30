@@ -1,4 +1,5 @@
 ﻿using Market.Domain.Entities.Identity;
+using Market.Domain.Entities.Sales;
 
 namespace Market.Application.Abstractions;
 
