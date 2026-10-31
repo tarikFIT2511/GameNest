@@ -1,5 +1,4 @@
-﻿using Market.Domain.Entities.Identity;
-using Market.Domain.Entities.Sales;
+﻿using Market.Domain.Entities.Sales;
 
 namespace Market.Application.Abstractions;
 
@@ -13,7 +12,6 @@ public interface IAppDbContext
     DbSet<RoleEntity> Roles { get; }
     DbSet<UserRoleEntity> UserRoles { get; }
     DbSet<ReviewEntity> Reviews { get; }
-    DbSet<ModerationActionEntity> ModerationActions { get; }
     DbSet<RefreshTokenEntity> RefreshTokens { get; }
     DbSet<GameEntity> Games { get; }
     DbSet<UserProfileEntity> UserProfiles { get; }

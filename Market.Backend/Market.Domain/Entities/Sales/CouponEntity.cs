@@ -1,4 +1,5 @@
-﻿using Market.Domain.Common;
+﻿// MarketUserEntity.cs
+using Market.Domain.Common;
 
 namespace Market.Domain.Entities.Sales;
 
